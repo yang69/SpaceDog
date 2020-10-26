@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN,zh-TW,en-US,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="msvalidate.01" content="01C36125D6A7876469541010EEBDB4C3">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yangnay.ml","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"always","offset":12,"onmobile":false,"dimmer":false,"padding":18},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Here&#39;s something encrypted, password is required to continue reading.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="996. 正方形数组的数目 | Number of Squareful Arrays【todo】">
+<meta property="og:url" content="https://yangnay.ml/leetcode/Number-of-Squareful-Arrays/index.html">
+<meta property="og:site_name" content="Space Dog">
+<meta property="og:description" content="Here&#39;s something encrypted, password is required to continue reading.">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-12-23T22:26:20.000Z">
+<meta property="article:modified_time" content="2019-12-23T22:26:20.000Z">
+<meta property="article:author" content="yang">
+<meta property="article:tag" content="leetcode">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://yangnay.ml/leetcode/Number-of-Squareful-Arrays/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>996. 正方形数组的数目 | Number of Squareful Arrays【todo】 | Space Dog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Space Dog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">When dreams go, life is a barren field frozen with snow.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+  <a href="https://github.com/yang69" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://yangnay.ml/leetcode/Number-of-Squareful-Arrays/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="yang">
+      <meta itemprop="description" content="光阴似箭，与我何关？你若安好，便是晴天~">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Space Dog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          996. 正方形数组的数目 | Number of Squareful Arrays【todo】
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-23 22:26:20" itemprop="dateCreated datePublished" datetime="2019-12-23T22:26:20+00:00">2019-12-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/leetcode/" itemprop="url" rel="index"><span itemprop="name">leetcode</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <div id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
+  <div class="hbe-input-container">
+  <input type="password" id="hbePass" placeholder="" />
+    <label for="hbePass">Hey, password is required here.</label>
+    <div class="bottom-line"></div>
+  </div>
+  <script id="hbeData" type="hbeData" data-hmacdigest="06f1d4a3bf5677ea1342c33f3cb8e09cda64e6f78967beb70353c16af04d6879">bc52a409ec42bdd74538100d12e86d7c3bc9859ac07880cae6644198499196222e3f8b390e845cac3f3628a9c0f58e502803521e64ae1649b8abac34e4c66f14708b0fb5ea0628591a50e67a4a376de4e784295282eef08307dab058782ad72570c2221d3cfec658855b67831d8cc540b41c69b981c0034400ec5c4d0d42cd0b38be6ee5bbab848cb53dbfbe4231265f20f87b827596987ac6c883490c2c9f4182dee2d40f8c7a4d46367d590404fd83b8a43ff1ca33cabceda891ba742b895a7b89bc7621c09fbf01a9e0e4e18e141785bf034e92a8a48fa0ba2e21a3eb30eca5faff193749e237653f85fdae2a7842fefdde6528c260b7e6907acea055ec4651b76d4a1692c0dc6188462f057a7d742f51e10dd50a4ad64f267a20d62ee96006fa6415214e9caae9cdd1a488037f89d2267bf8cc93470baae1cf0ab90f7f86125bf23b3c60d89f84e4f8b5b38dc540c25727827e0047ca6d4d233d50aa6cb688645d826390d6e9ce17259b97954daf5bfbe76bac0cda4441703aaa212127fa20110957fa2b86534ed995cbecfc998286285eec33f162d003d4d9f6f41604ff0bfd9e7e2cb6c597e29840a351f7f6c4dfd5212ede01b1dfb590dea2515817060f0c5d17ad9c833668be51b2aba25aee0c1da5ac90e9f50d887081cf6ed69a9994d94a6f156ced737d6cfa7569057c702aef46a060b5f57088e83f79075e2ccea139452b330086cdbe9d13ea37c9482b342aa229e89f8edd3b156b5e19c7f3fe16399d183079dce295a02d0fb9e470ad0b502645cafc31ede32d7d568791088ff94983edfcbccffb388acf1f25bad047f48a3d4ffcbaa9720a8ba6a280611898297806fc871bd9c4a7c87ff36ff17874255cd8c5f31779c9e631f754eaf5bcc47ba3a1d29d8ec02c4e4e9a4347de4f54ad64fb2844dfce7d5133d126b2e0e083905f504cd0873373a089dfe8c78b1c2e4adf4dcf8e399bbb854d13dfcbadada84a9029858fe79c47d67535e988e9264da478e1a8301423e34c2ad88fac07f52713f585e1cb087ce211457ad1c5758ef5a3285f17923b7e48d9c7b3277868cbd561f992ad1b024faa23e3325fa6aee0950262ec5882a4d9744b3029c046b9269be4aa035ed2b21255a3cde599dd78ecdaefabbd2a91cf76b2651fcb4c78681413f8ab8bf01879a17b255733d97a29bb3a43256e77c3169b68dfaf5a306980841764d97b6588feab94fc9d70c0bca8bc65a8870f32547c5c2150c9ef50783c2142538e9c00f52e618e9a75533e14355f1faf79d2951ada0c5cd7f635ab1e4ed4b11943fff483d2a09b613f85e734c07672f7678d19f1880c4d3d130b983861ae4ffc7d972931c40d4a7ccfe46f08cc8493a1cb08b9f0050387ad01fed5535f1ad42549c57f4e91be0baf2d1bd9390cc3937a037f9e3124e06ac3bf70fe4a906099b6d141ad37d41794c3819a86390e644965fae05a999f9f56ecbc43535f615d2898a62e18fbef0ed3074919452bf47677bc8e7dea916b2808569ddab1c5c06c756b356ad5c3176f3e512fb51512e8ec09e60c97018c1e1532210e09cc0da1eda0f697610c7725bbfbee4098730fb1d165a0e036a1eb6179300f26faaad8635dad55bcbebf5a33e115559c13e5c4c0a67c245e41e86d2487dbf9b01d10a3d04e1a8939f1d60201faa5f32893c922e3128b25c7865e67f5b65085dd1cc895ce5f6154a18a46a4987240ac3b7a682fdb07f0d449474dde500b7586c70fa38006245b3fc7eb6c285cca41bfd1bce8aec02872ebe4bb6439846efaf5c425e670116e8aa88fa862ce85a4cb4b2d9fc8a9b9e6883c5bcfee3d842e39ef29383454c4862ab8a5e1a775e310dbf76b06ae40df4476374e519bc6a9dd34dc57ffb40b971e458e3022d4679d890640efc792a331ae5c384f7f2e0e745845c6185b7d50964564db040b20e1fde0315a874f723958125393672f48474f2792a05b6b7d36dd53296c42f5dd1c3154ac9e93054f66da734ea3854a2cb9d066a0631c09f9180def03ed3f18b4b2d71adb4ef2e1e56c543ed6d2961dbda2c30146a6d7ac2d48fb27412943116b777b744bf5bd7dca1fd6e8a56c30807a944f4aa2f5cd5cab11e7f6ebc3bea6d528aeb1aff19cd2b58c759699aeb4afbdf2687a48f82e32d201da8d76c7dfefe5e1a05097ecad9ecddee8db96284505737d54c80be242aeb7f26d87347f79aa7c98e7f9e9a38d727a71484eb97dda88bb1490e9d8b0da08fac6c7d5b0a18d72b1c935c8efc3449e1c1f01b6256f37f4bb12f03e081fede4dd3fd1cecf29f32be92c37fbba9d90f29a4d31f823e5e2832ed282b49837c61025b3ca65a6010c9fe1c0ce075cdac57f4609b1dbf5af6e82170f7301a05ccc6931f72ed08845231925ee49787d896687c2478bf6194962e422a26b4d12c1de4031c8c80a8032473784f4455ad63ce418b6da84c7936bed2e09779e2404a35a5d19ef0c9f5133d33c540e35d722cfcbd49f7652cd4b0f84fd5db6f825a545d3c2146a776847</script>
+</div>
+<script src="/lib/blog-encrypt.js"></script><link href="/css/blog-encrypt.css" rel="stylesheet" type="text/css">
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/leetcode/" rel="tag"># leetcode</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/leetcode/Find-the-Town-Judge/" rel="prev" title="997. 找到小镇的法官 | Find the Town Judge">
+      <i class="fa fa-chevron-left"></i> 997. 找到小镇的法官 | Find the Town Judge
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/leetcode/Minimum-Number-of-K-Consecutive-Bit-Flips/" rel="next" title="995. K 连续位的最小翻转次数 | Minimum Number of K Consecutive Bit Flips">
+      995. K 连续位的最小翻转次数 | Minimum Number of K Consecutive Bit Flips <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">yang</p>
+  <div class="site-description" itemprop="description">光阴似箭，与我何关？你若安好，便是晴天~</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">139</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yang69" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yang69" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitlab.com/yang69" title="GitLab → https:&#x2F;&#x2F;gitlab.com&#x2F;yang69" rel="noopener" target="_blank"><i class="fa fa-fw fa-gitlab"></i>GitLab</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yang66999@qq.com" title="E-Mail → mailto:yang66999@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/WuXianGu" title="无线谷 → https:&#x2F;&#x2F;github.com&#x2F;WuXianGu" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>无线谷</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.jianshu.com/u/a220eac0a8a4" title="https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;a220eac0a8a4" rel="noopener" target="_blank">敲代码的密斯想</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://tech.meituan.com/" title="https:&#x2F;&#x2F;tech.meituan.com&#x2F;" rel="noopener" target="_blank">美团技术博客</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://tech.youzan.com/" title="https:&#x2F;&#x2F;tech.youzan.com&#x2F;" rel="noopener" target="_blank">有赞技术团队</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.jianshu.com/u/90ab66c248e6" title="https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;90ab66c248e6" rel="noopener" target="_blank">占小狼</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://jm.taobao.org/" title="http:&#x2F;&#x2F;jm.taobao.org&#x2F;" rel="noopener" target="_blank">阿里中间件团队博客</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://hack.xingren.com/" title="http:&#x2F;&#x2F;hack.xingren.com&#x2F;" rel="noopener" target="_blank">杏仁技术站</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.jianshu.com/u/6b440373157d" title="https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;6b440373157d" rel="noopener" target="_blank">牛客网面经</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.gitnavi.com/u/judasn/" title="http:&#x2F;&#x2F;www.gitnavi.com&#x2F;u&#x2F;judasn&#x2F;" rel="noopener" target="_blank">gitnavi</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">yang</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '571a98c25edeca50d2f5',
+      clientSecret: 'df2c0e760c831a41d01080355c84e1e6f0c30b9a',
+      repo        : 'SpaceDog',
+      owner       : 'yang69',
+      admin       : ['yang69'],
+      id          : 'af25b40f351e378ce46425097416ccf1',
+        language: '',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

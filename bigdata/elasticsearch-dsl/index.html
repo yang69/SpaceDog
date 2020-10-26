@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh-CN,zh-TW,en-US,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="msvalidate.01" content="01C36125D6A7876469541010EEBDB4C3">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yangnay.ml","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"always","offset":12,"onmobile":false,"dimmer":false,"padding":18},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一、简介Elasticsearch DSL 是用于查询 Elasticsearch 的专用语言。它其实就是一个 json ，其中的不同节点代表不同的含义。通过不同语句的组合形成灵活的查询条件。 Elasticsearch 只认识 Elasticsearch DSL 这一种查询语言。当然，可以通过插件来支持SQL查询，插件的原理自然是将SQL转换为等价的DSL语句。 二、查询分页查询size 参数用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Elasticsearch DSL">
+<meta property="og:url" content="https://yangnay.ml/bigdata/elasticsearch-dsl/index.html">
+<meta property="og:site_name" content="Space Dog">
+<meta property="og:description" content="一、简介Elasticsearch DSL 是用于查询 Elasticsearch 的专用语言。它其实就是一个 json ，其中的不同节点代表不同的含义。通过不同语句的组合形成灵活的查询条件。 Elasticsearch 只认识 Elasticsearch DSL 这一种查询语言。当然，可以通过插件来支持SQL查询，插件的原理自然是将SQL转换为等价的DSL语句。 二、查询分页查询size 参数用">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-01-04T20:45:51.000Z">
+<meta property="article:modified_time" content="2019-01-04T20:45:51.000Z">
+<meta property="article:author" content="yang">
+<meta property="article:tag" content="elasticsearch">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://yangnay.ml/bigdata/elasticsearch-dsl/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>Elasticsearch DSL | Space Dog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Space Dog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">When dreams go, life is a barren field frozen with snow.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+  <a href="https://github.com/yang69" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://yangnay.ml/bigdata/elasticsearch-dsl/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="yang">
+      <meta itemprop="description" content="光阴似箭，与我何关？你若安好，便是晴天~">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Space Dog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Elasticsearch DSL
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-01-04 20:45:51" itemprop="dateCreated datePublished" datetime="2019-01-04T20:45:51+00:00">2019-01-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/bigdata/" itemprop="url" rel="index"><span itemprop="name">bigdata</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/bigdata/elasticsearch/" itemprop="url" rel="index"><span itemprop="name">elasticsearch</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h3><p>Elasticsearch DSL 是用于查询 Elasticsearch 的专用语言。它其实就是一个 json ，其中的不同节点代表不同的含义。通过不同语句的组合形成灵活的查询条件。</p>
+<p>Elasticsearch 只认识 Elasticsearch DSL 这一种查询语言。当然，可以通过插件来支持SQL查询，插件的原理自然是将SQL转换为等价的DSL语句。</p>
+<h3 id="二、查询"><a href="#二、查询" class="headerlink" title="二、查询"></a>二、查询</h3><h4 id="分页查询"><a href="#分页查询" class="headerlink" title="分页查询"></a>分页查询</h4><p><code>size</code> 参数用于指定每页的大小， <code>from</code> 参数用于指定跳过最初的多少个文档</p>
+<p>如果要查询从第3个开始，每页10条记录的文档，查询语句应该这么设定：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;size:10, from: 2&quot;</span><br></pre></td></tr></table></figure>
+
+<p>深分页问题：</p>
+<ul>
+<li>游标查询：<a href="https://www.elastic.co/guide/cn/elasticsearch/guide/current/scroll.html" target="_blank" rel="noopener">https://www.elastic.co/guide/cn/elasticsearch/guide/current/scroll.html</a></li>
+</ul>
+<h4 id="bool查询"><a href="#bool查询" class="headerlink" title="bool查询"></a>bool查询</h4><p>bool查询用于组合多个查询条件，它的属性包括</p>
+<ul>
+<li><code>must</code> 必须满足的条件</li>
+<li><code>must_not</code> 必须不满足的条件</li>
+<li><code>should</code> 尽量满足的条件</li>
+</ul>
+<h4 id="范围查询"><a href="#范围查询" class="headerlink" title="范围查询"></a>范围查询</h4><p>range语句用于对字段进行范围限制。它可以应用在数值型字段、时间型字段上。range语句支持4种限制类型：</p>
+<ul>
+<li><code>gte</code> : 大于等于</li>
+<li><code>gt</code> : 大于</li>
+<li><code>lte</code> : 小于等于</li>
+<li><code>lt</code> : 小于</li>
+</ul>
+<p>举个例子，下面这条语句限定查询结果的 timestamp 字段的值在 [1548086400000, 1548259200000) 内</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"range"</span>: &#123;</span><br><span class="line">    <span class="attr">"timestamp"</span>: &#123;</span><br><span class="line">      <span class="attr">"gte"</span>: <span class="number">1548086400000</span>,</span><br><span class="line">      <span class="attr">"lt"</span>: <span class="number">1548259200000</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="存在性查询"><a href="#存在性查询" class="headerlink" title="存在性查询"></a>存在性查询</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"exists"</span>: &#123;</span><br><span class="line">    <span class="attr">"field"</span>: <span class="string">"timestamp"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="选择字段"><a href="#选择字段" class="headerlink" title="选择字段"></a>选择字段</h4><p><code>_source</code> 可以获取指定的字段，类似于 <code>select id from table</code></p>
+<p>查询 field1 和 field2 这两个字段</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;_source&quot;:[&quot;field1&quot;, &quot;field2&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>如果不指定 <code>_source</code> ，则表明查询所有字段</p>
+<h3 id="三、聚合"><a href="#三、聚合" class="headerlink" title="三、聚合"></a>三、聚合</h3><p>ES的聚合由两个核心概念组成：桶(buckets)和指标(metrics)。</p>
+<ul>
+<li>桶(buckets)是满足特定条件的文档的集合</li>
+<li>指标(metrics)是根据桶内文档的得出的统计量，比如“和”、“平均数”、“方差”……</li>
+</ul>
+<p>桶在概念上类似于 SQL 的分组（GROUP BY），而指标则类似于 COUNT() 、 SUM() 、 MAX() 等统计方法。<br>用SQL来做类比：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">COUNT</span>(color)</span><br><span class="line"><span class="keyword">FROM</span> <span class="keyword">table</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> color</span><br></pre></td></tr></table></figure>
+<p>上述语句中，<code>COUNT(color)</code>相当于指标，<code>GROUP BY color</code>相当于桶。</p>
+<h4 id="时间柱状图"><a href="#时间柱状图" class="headerlink" title="时间柱状图"></a>时间柱状图</h4><p><code>date_histogram</code> 用于生成折线图。它支持如下属性：</p>
+<ul>
+<li><code>field</code> 指定使用的时间字段。实际上，也可以使用任何数值型字段。</li>
+<li><code>interval</code> 指定时间间隔，即相邻两个数据点之间的间隔。可以直接指定数值，或者设为 “second”, “minute”, “hour”, “day”, “week”, “month” 等等，也可以设为 “10m”（十分钟）, “2h”（两小时）</li>
+<li><code>time_zone</code> 时区。例如北京时间需要设置为： “+08:00”</li>
+<li><code>format</code> 时间格式。例如“yyyy-MM-dd HH:mm:ss”</li>
+</ul>
+<ul>
+<li><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-datehistogram-aggregation.html" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-datehistogram-aggregation.html</a></li>
+</ul>
+<h4 id="top-hits"><a href="#top-hits" class="headerlink" title="top_hits"></a>top_hits</h4><ul>
+<li><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-top-hits-aggregation.html" target="_blank" rel="noopener">https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-top-hits-aggregation.html</a></li>
+</ul>
+<h4 id="近似聚合"><a href="#近似聚合" class="headerlink" title="近似聚合"></a>近似聚合</h4><ul>
+<li>百分位数计算：<a href="https://www.elastic.co/guide/cn/elasticsearch/guide/current/percentiles.html#_%E7%99%BE%E5%88%86%E4%BD%8D%E7%AD%89%E7%BA%A7" target="_blank" rel="noopener">https://www.elastic.co/guide/cn/elasticsearch/guide/current/percentiles.html#_%E7%99%BE%E5%88%86%E4%BD%8D%E7%AD%89%E7%BA%A7</a></li>
+</ul>
+<h3 id="四、常用查询示例"><a href="#四、常用查询示例" class="headerlink" title="四、常用查询示例"></a>四、常用查询示例</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"query"</span>: &#123;</span><br><span class="line">    <span class="attr">"bool"</span>: &#123;</span><br><span class="line">      <span class="attr">"must"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="attr">"terms"</span>: &#123;</span><br><span class="line">            <span class="attr">"key"</span>: [</span><br><span class="line">              <span class="string">"######"</span></span><br><span class="line">            ]</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"size"</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="attr">"aggs"</span>: &#123;</span><br><span class="line">    <span class="attr">"requestCount"</span>: &#123;</span><br><span class="line">      <span class="attr">"date_histogram"</span>: &#123;</span><br><span class="line">        <span class="attr">"field"</span>: <span class="string">"timestamp"</span>,</span><br><span class="line">        <span class="attr">"interval"</span>: <span class="string">"#####"</span>,</span><br><span class="line">        <span class="attr">"time_zone"</span>: <span class="string">"+08:00"</span>,</span><br><span class="line">        <span class="attr">"format"</span>: <span class="string">"yyyy-MM-dd HH"</span></span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">"aggs"</span>: &#123;</span><br><span class="line">        <span class="attr">"requestCount"</span>: &#123;</span><br><span class="line">          <span class="attr">"sum"</span>: &#123;</span><br><span class="line">            <span class="attr">"field"</span>: <span class="string">"requestCount"</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"hitCount"</span>: &#123;</span><br><span class="line">          <span class="attr">"sum"</span>: &#123;</span><br><span class="line">            <span class="attr">"field"</span>: <span class="string">"hitCount"</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"default"</span>: &#123;</span><br><span class="line">          <span class="attr">"sum"</span>: &#123;</span><br><span class="line">            <span class="attr">"field"</span>: <span class="string">"returnCodeMap.#####"</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"code"</span>: &#123;</span><br><span class="line">          <span class="attr">"sum"</span>: &#123;</span><br><span class="line">            <span class="attr">"field"</span>: <span class="string">"returnCodeMap.#####"</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="五、参考链接"><a href="#五、参考链接" class="headerlink" title="五、参考链接"></a>五、参考链接</h3><ul>
+<li><a href="https://www.cnblogs.com/ghj1976/p/5293250.html" target="_blank" rel="noopener">https://www.cnblogs.com/ghj1976/p/5293250.html</a></li>
+<li><a href="https://blog.csdn.net/qq_41455420/article/details/84206690" target="_blank" rel="noopener">https://blog.csdn.net/qq_41455420/article/details/84206690</a></li>
+<li><a href="https://blog.csdn.net/mrxuchen/article/details/80040720" target="_blank" rel="noopener">https://blog.csdn.net/mrxuchen/article/details/80040720</a></li>
+<li><a href="https://blog.csdn.net/sxf_123456/article/details/77227529" target="_blank" rel="noopener">https://blog.csdn.net/sxf_123456/article/details/77227529</a></li>
+<li>深分页解决方案：<a href="https://blog.csdn.net/u011228889/article/details/79760167" target="_blank" rel="noopener">https://blog.csdn.net/u011228889/article/details/79760167</a></li>
+<li>ElasticSearch中”distinct”,”count”和”group by”的实现：<a href="https://www.jianshu.com/p/62bed9cc8349" target="_blank" rel="noopener">https://www.jianshu.com/p/62bed9cc8349</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/elasticsearch/" rel="tag"># elasticsearch</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/language/data-exchange-standard/yaml/" rel="prev" title="yaml">
+      <i class="fa fa-chevron-left"></i> yaml
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/bigdata/hive/" rel="next" title="Hive">
+      Hive <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、简介"><span class="nav-text">一、简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、查询"><span class="nav-text">二、查询</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#分页查询"><span class="nav-text">分页查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#bool查询"><span class="nav-text">bool查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#范围查询"><span class="nav-text">范围查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#存在性查询"><span class="nav-text">存在性查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#选择字段"><span class="nav-text">选择字段</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、聚合"><span class="nav-text">三、聚合</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#时间柱状图"><span class="nav-text">时间柱状图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#top-hits"><span class="nav-text">top_hits</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#近似聚合"><span class="nav-text">近似聚合</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四、常用查询示例"><span class="nav-text">四、常用查询示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#五、参考链接"><span class="nav-text">五、参考链接</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">yang</p>
+  <div class="site-description" itemprop="description">光阴似箭，与我何关？你若安好，便是晴天~</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">139</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yang69" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yang69" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitlab.com/yang69" title="GitLab → https:&#x2F;&#x2F;gitlab.com&#x2F;yang69" rel="noopener" target="_blank"><i class="fa fa-fw fa-gitlab"></i>GitLab</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yang66999@qq.com" title="E-Mail → mailto:yang66999@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/WuXianGu" title="无线谷 → https:&#x2F;&#x2F;github.com&#x2F;WuXianGu" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>无线谷</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://www.jianshu.com/u/a220eac0a8a4" title="https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;a220eac0a8a4" rel="noopener" target="_blank">敲代码的密斯想</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://tech.meituan.com/" title="https:&#x2F;&#x2F;tech.meituan.com&#x2F;" rel="noopener" target="_blank">美团技术博客</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://tech.youzan.com/" title="https:&#x2F;&#x2F;tech.youzan.com&#x2F;" rel="noopener" target="_blank">有赞技术团队</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.jianshu.com/u/90ab66c248e6" title="https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;90ab66c248e6" rel="noopener" target="_blank">占小狼</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://jm.taobao.org/" title="http:&#x2F;&#x2F;jm.taobao.org&#x2F;" rel="noopener" target="_blank">阿里中间件团队博客</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://hack.xingren.com/" title="http:&#x2F;&#x2F;hack.xingren.com&#x2F;" rel="noopener" target="_blank">杏仁技术站</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.jianshu.com/u/6b440373157d" title="https:&#x2F;&#x2F;www.jianshu.com&#x2F;u&#x2F;6b440373157d" rel="noopener" target="_blank">牛客网面经</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.gitnavi.com/u/judasn/" title="http:&#x2F;&#x2F;www.gitnavi.com&#x2F;u&#x2F;judasn&#x2F;" rel="noopener" target="_blank">gitnavi</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2018 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">yang</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.2
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '571a98c25edeca50d2f5',
+      clientSecret: 'df2c0e760c831a41d01080355c84e1e6f0c30b9a',
+      repo        : 'SpaceDog',
+      owner       : 'yang69',
+      admin       : ['yang69'],
+      id          : '99e5badda8ebb8adce63ab58130beb30',
+        language: '',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
